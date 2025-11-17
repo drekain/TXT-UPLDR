@@ -584,11 +584,18 @@ else:
     else:
         count = int(raw_text)
 
-    try:
+try:
         for i in range(count - 1, len(links)):
-            V = links[i][1].replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","") # .replace("mpd","m3u8")
+            V = links[i][1].replace("file/d/", "uc?export=download&id=")\
+                           .replace("www.youtube-nocookie.com/embed", "youtu.be")\
+                           .replace("?modestbranding=1", "")\
+                           .replace("/view?usp=sharing", "")
+
             url = "https://" + V
 
+            # -------------------------
+            # 1) VISIONIAS SECTION
+            # -------------------------
             if "visionias" in url:
                 async with ClientSession() as session:
                     async with session.get(
@@ -608,7 +615,7 @@ else:
                             'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"',
                             'sec-ch-ua-mobile': '?1',
                             'sec-ch-ua-platform': '"Android"',
-                        },
+                        }
                     ) as resp:
                         text = await resp.text()
                         match = re.search(r'(https://.*?playlist\.m3u8.*?)"', text)
@@ -617,41 +624,46 @@ else:
                         else:
                             url = None
 
-# --------------------------------------------------
-# 👉 ALL OTHER CONDITIONS MUST BE OUTSIDE THE async block
-# ---------------------------------------------------
+            # -------------------------
+            # 2) CLASSPLUS DRM
+            # -------------------------
+            elif 'media-cdn.classplusapp.com/drm/' in url:
+                url = f"https://dragoapi.vercel.app/video/{url}"
 
-elif 'media-cdn.classplusapp.com/drm/' in url:
-    url = f"https://dragoapi.vercel.app/video/{url}"
+            # -------------------------
+            # 3) CLASSPLUS JW SIGNED
+            # -------------------------
+            elif 'videos.classplusapp' in url:
+                url = requests.get(
+                    f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}',
+                    headers={'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9'}
+                ).json()['url']
 
-elif 'videos.classplusapp' in url:
-    url = requests.get(
-        f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}',
-        headers={'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9'}
-    ).json()['url']
+            # -------------------------
+            # 4) TENCDN / ALISG / MCDN
+            # -------------------------
+            elif ("tencdn.classplusapp" in url or 
+                  "media-cdn-alisg.classplusapp.com" in url or
+                  "videos.classplusapp" in url or 
+                  "media-cdn.classplusapp" in url):
 
-elif ("tencdn.classplusapp" in url or 
-      "media-cdn-alisg.classplusapp.com" in url or
-      "videos.classplusapp" in url or 
-      "media-cdn.classplusapp" in url):
-
-    headers = {
-        'Host': 'api.classplusapp.com',
-        'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9',
-        'user-agent': 'Mobile-Android',
-        'app-version': '1.4.37.1',
-        'api-version': '18',
-        'device-id': '5d0d17ac8b3c9f51',
-        'device-details': '2848b866799971ca_2848b8667a33216c_SDK-30',
-        'accept-encoding': 'gzip'
-    }
-    params = (('url', f'{url}'),)
-    response = requests.get(
-        'https://api.classplusapp.com/cams/uploader/video/jw-signed-url',
-        headers=headers,
-        params=params
-    )
-    url = response.json()['url']
+                headers = {
+                    'Host': 'api.classplusapp.com',
+                    'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9',
+                    'user-agent': 'Mobile-Android',
+                    'app-version': '1.4.37.1',
+                    'api-version': '18',
+                    'device-id': '5d0d17ac8b3c9f51',
+                    'device-details': '2848b866799971ca_2848b8667a33216c_SDK-30',
+                    'accept-encoding': 'gzip'
+                }
+                params = (('url', f'{url}'),)
+                response = requests.get(
+                    'https://api.classplusapp.com/cams/uploader/video/jw-signed-url',
+                    headers=headers,
+                    params=params
+                )
+                url = response.json()['url']
 
 elif "https://appx-transcoded-videos.livelearn.in/videos/rozgar-data/" in url:
     url = url.replace("https://appx-transcoded-videos.livelearn.in/videos/rozgar-data/", "")

@@ -38,9 +38,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 # Environment / constants
 COOKIES_FILE_PATH = os.getenv("COOKIES_FILE_PATH", "youtube_cookies.txt")
-OWNER_ID = 5840594311
-SUDO_USERS = [5840594311]
-AUTH_CHANNELS = [-1002605113558, -1002663510614]
+OWNER_ID = 5663132413
+SUDO_USERS = [5663132413]
+AUTH_CHANNELS = [-100339820439]
 
 # Helper: authorization check
 def is_authorized(user_id: int) -> bool:

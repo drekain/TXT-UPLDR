@@ -780,157 +780,195 @@ elif "/master.mpd" in url or "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
                         response = scraper.get(url)
 
         # Check if the response status is OK
-                        if response.status_code == 200:
-            # Write the PDF content to a file
-                            with open(f'{name}.pdf', 'wb') as file:
-                                file.write(response.content)
+# ------------------ LIVELEARN --------------------
+            elif "https://appx-transcoded-videos.livelearn.in/videos/rozgar-data/" in url:
+                url = url.replace(
+                    "https://appx-transcoded-videos.livelearn.in/videos/rozgar-data/", ""
+                )
+                name1 = (
+                    links[i][0]
+                    .replace("\t", "")
+                    .replace(":", "")
+                    .replace("/", "")
+                    .replace("+", "")
+                    .replace("#", "")
+                    .replace("|", "")
+                    .replace("*", "")
+                    .replace(".", "")
+                    .strip()
+                )
+                name = f'{str(count).zfill(3)}) {name1[:60]}'
+                cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
 
-            # Send the PDF document
-                            await asyncio.sleep(4)
-                            copy = await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)
-                            count += 1
+            # ------------------ AKAMAI LIVELEARN --------------------
+            elif "https://appx-transcoded-videos-mcdn.akamai.net.in/videos/bhainskipathshala-data/" in url:
+                url = url.replace(
+                    "https://appx-transcoded-videos-mcdn.akamai.net.in/videos/bhainskipathshala-data/",
+                    ""
+                )
+                name1 = (
+                    links[i][0]
+                    .replace("\t", "")
+                    .replace(":", "")
+                    .replace("/", "")
+                    .replace("+", "")
+                    .replace("#", "")
+                    .replace("|", "")
+                    .replace("*", "")
+                    .replace(".", "")
+                    .strip()
+                )
+                name = f'{str(count).zfill(3)}) {name1[:60]}'
+                cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
 
-            # Remove the PDF file after sending
-                            os.remove(f'{name}.pdf')
-                        else:
-                            await m.reply_text(f"Failed to download PDF: {response.status_code} {response.reason}")
+            # ------------------ UTKARSH --------------------
+            elif "apps-s3-jw-prod.utkarshapp.com" in url:
+                if "enc_plain_mp4" in url:
+                    url = url.replace(url.split("/")[-1], res + ".mp4")
 
-                    except FloodWait as e:
-                        await m.reply_text(str(e))
-                        time.sleep(e.x)
-                        continue
-                        
-                #elif "muftukmall" in url:
-                    #try:
-                        #await bot.send_photo(chat_id=m.chat.id, photo=pwimg, caption=cpw)
-                        #count +=1
-                    #except Exception as e:
-                        #await m.reply_text(str(e))    
-                        #time.sleep(1)    
-                        #continue
-                
-                #elif "youtu" in url:
-                    #try:
-                        #await bot.send_photo(chat_id=m.chat.id, photo=ytimg, caption=cyt)
-                        #count +=1
-                    #except Exception as e:
-                        #await m.reply_text(str(e))    
-                        #time.sleep(1)    
-                        #continue
+                elif "Key-Pair-Id" in url:
+                    url = None
 
-                elif "media-cdn.classplusapp.com/drm/" in url:
-                    try:
-                        await bot.send_photo(chat_id=m.chat.id, photo=cpimg, caption=cpvod)
-                        count +=1
-                    except Exception as e:
-                        await m.reply_text(str(e))    
-                        time.sleep(1)    
-                        continue          
-                        
-                
-                elif any(ext in url.lower() for ext in [".jpg", ".jpeg", ".png"]):
-                    try:
-                        await asyncio.sleep(4)  # Use asyncio.sleep for non-blocking sleep
-                        # Replace spaces with %20 in the URL
-                        url = url.replace(" ", "%20")
+                elif ".m3u8" in url:
+                    q = (m3u8.loads(requests.get(url).text)).data["playlists"][1]["uri"].split("/")[0]
+                    x = url.split("/")[5]
+                    x = url.replace(x, "")
+                    url = (
+                        (m3u8.loads(requests.get(url).text)).data["playlists"][1]["uri"]
+                    ).replace(q + "/", x)
 
-                        # Create a cloudscraper session for image download
-                        scraper = cloudscraper.create_scraper()
+            # ------------------ PW DRM --------------------
+            elif "/master.mpd" in url or "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+                id = url.split("/")[-2]
+                url = (
+                    f"https://anonymouspwplayerr-f996115ea61a.herokuapp.com/pw?url={url}&token={raw_text4}"
+                )
 
-                        # Send a GET request to download the image
-                        response = scraper.get(url)
+            # ------------------ IMAGE DOWNLOAD --------------------
+            elif any(ext in url.lower() for ext in [".jpg", ".jpeg", ".png"]):
+                try:
+                    await asyncio.sleep(4)
+                    url = url.replace(" ", "%20")
 
-                        # Check if the response status is OK
-                        if response.status_code == 200:
-                            # Write the image content to a file
-                            with open(f'{name}.jpg', 'wb') as file:  # Save as JPG (or PNG if you want)
-                                file.write(response.content)
+                    scraper = cloudscraper.create_scraper()
+                    response = scraper.get(url)
 
-                            # Send the image document
-                            await asyncio.sleep(2)  # Non-blocking sleep
-                            copy = await bot.send_photo(chat_id=m.chat.id, photo=f'{name}.jpg', caption=cimg)
-                            count += 1
+                    if response.status_code == 200:
+                        with open(f"{name}.jpg", "wb") as file:
+                            file.write(response.content)
 
-                            # Remove the image file after sending
-                            os.remove(f'{name}.jpg')
-
-                        else:
-                            await m.reply_text(f"Failed to download Image: {response.status_code} {response.reason}")
-
-                    except FloodWait as e:
-                        await m.reply_text(str(e))
-                        await asyncio.sleep(2)  # Use asyncio.sleep for non-blocking sleep
-                        return  # Exit the function to avoid continuation  
-                    
-                    except Exception as e:
-                        await m.reply_text(f"An error occurred: {str(e)}")
-                        await asyncio.sleep(4)  # You can replace this with more specific 
-                        
-                elif ".zip" in url:
-                    try:
-                        cmd = f'yt-dlp -o "{name}.zip" "{url}"'
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                        os.system(download_cmd)
-                        copy = await bot.send_document(chat_id=m.chat.id, document=f'{name}.zip', caption=cczip)
+                        await asyncio.sleep(2)
+                        copy = await bot.send_photo(
+                            chat_id=m.chat.id, photo=f"{name}.jpg", caption=cimg
+                        )
                         count += 1
-                        os.remove(f'{name}.zip')
-                    except FloodWait as e:
-                        await m.reply_text(str(e))
-                        time.sleep(e.x)
-                        count += 1
-                        continue
-                        
-                elif ".pdf" in url:
-                    try:
-                        cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                        os.system(download_cmd)
-                        copy = await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)
-                        count += 1
-                        os.remove(f'{name}.pdf')
-                    except FloodWait as e:
-                        await m.reply_text(str(e))
-                        time.sleep(e.x)
-                        continue
-                else:
-                    emoji_message = await show_random_emojis(message)
-                    remaining_links = len(links) - count
-                    Show = f"**🍁 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗜𝗡𝗚 🍁**\n\n**📝ɴᴀᴍᴇ » ** `{name}\n\n🔗ᴛᴏᴛᴀʟ ᴜʀʟ » {len(links)}\n\n🗂️ɪɴᴅᴇx » {str(count)}/{len(links)}\n\n🌐ʀᴇᴍᴀɪɴɪɴɢ ᴜʀʟ » {remaining_links}\n\n❄ǫᴜᴀʟɪᴛʏ » {res}`\n\n**🔗ᴜʀʟ » ** `{url}`\n\n🤖𝗕𝗢𝗧 𝗠𝗔𝗗𝗘 𝗕𝗬 ➤ 𝗧𝗨𝗦𝗛𝗔𝗥\n\n🙂 चलो फिर से अजनबी बन जायें 🙂"
-                    prog = await m.reply_text(Show)
-                    res_file = await helper.download_video(url, cmd, name)
-                    filename = res_file
-                    await prog.delete(True)
-                    await emoji_message.delete()
-                    await helper.send_vid(bot, m, cc, filename, thumb, name, prog)
+                        os.remove(f"{name}.jpg")
+
+                    else:
+                        await m.reply_text(
+                            f"Failed to download Image: {response.status_code} {response.reason}"
+                        )
+
+                except FloodWait as e:
+                    await m.reply_text(str(e))
+                    await asyncio.sleep(2)
+                    return
+
+                except Exception as e:
+                    await m.reply_text(f"An error occurred: {str(e)}")
+                    await asyncio.sleep(4)
+
+            # ------------------ ZIP --------------------
+            elif ".zip" in url:
+                try:
+                    cmd = f'yt-dlp -o "{name}.zip" "{url}"'
+                    download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                    os.system(download_cmd)
+                    copy = await bot.send_document(
+                        chat_id=m.chat.id, document=f"{name}.zip", caption=cczip
+                    )
                     count += 1
-                    time.sleep(1)
+                    os.remove(f"{name}.zip")
 
-            except Exception as e:
-                await m.reply_text(f'‼️𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱𝗶𝗻𝗴 𝗙𝗮𝗶𝗹𝗲𝗱‼️\n\n'
-                                   f'📝𝗡𝗮𝗺𝗲 » `{name}`\n\n'
-                                   f'🔗𝗨𝗿𝗹 » <a href="{url}">__**Click Here to See Link**__</a>`')
-                                   
+                except FloodWait as e:
+                    await m.reply_text(str(e))
+                    time.sleep(e.x)
+                    count += 1
+                    continue
+
+            # ------------------ PDF --------------------
+            elif ".pdf" in url:
+                try:
+                    cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
+                    download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                    os.system(download_cmd)
+                    copy = await bot.send_document(
+                        chat_id=m.chat.id, document=f"{name}.pdf", caption=cc1
+                    )
+                    count += 1
+                    os.remove(f"{name}.pdf")
+
+                except FloodWait as e:
+                    await m.reply_text(str(e))
+                    time.sleep(e.x)
+                    continue
+
+            # ------------------ VIDEO --------------------
+            else:
+                emoji_message = await show_random_emojis(message)
+                remaining_links = len(links) - count
+
+                Show = (
+                    f"**🍁 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗜𝗡𝗚 🍁**\n\n"
+                    f"**📝ɴᴀᴍᴇ » ** `{name}\n\n"
+                    f"🔗ᴛᴏᴛ𝗔𝗟 ᴜ𝗥𝗟 » {len(links)}\n\n"
+                    f"🗂️ɪɴ𝗗𝗘𝗫 » {str(count)}/{len(links)}\n\n"
+                    f"🌐ʀ𝗘𝗠𝗔ɪɴɪɴ𝗚 ᴜ𝗥𝗟 » {remaining_links}\n\n"
+                    f"❄ǫᴜᴀ𝗟ɪ𝗧𝗬 » {res}`\n\n"
+                    f"**🔗ᴜ𝗥𝗟 » ** `{url}`\n\n"
+                    f"🤖𝗕𝗢𝗧 𝗠𝗔𝗗𝗘 𝗕𝗬 ➤ 𝗧𝗨𝗦𝗛𝗔𝗥\n\n"
+                    f"🙂 चलो फिर से अजनबी बन जायें 🙂"
+                )
+
+                prog = await m.reply_text(Show)
+                res_file = await helper.download_video(url, cmd, name)
+                filename = res_file
+                await prog.delete(True)
+                await emoji_message.delete()
+                await helper.send_vid(bot, m, cc, filename, thumb, name, prog)
                 count += 1
-                failed_count += 1
-                continue   
-                
+                time.sleep(1)
 
-    except Exception as e:
-        await m.reply_text(e)
-    #await m.reply_text("**🥳𝗦𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆 𝗗𝗼𝗻𝗲🥳**")
-    await m.reply_text(f"`✨𝗕𝗔𝗧𝗖𝗛 𝗦𝗨𝗠𝗠𝗔𝗥𝗬✨\n\n"
-                       f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
-                       f"📛𝗜𝗻𝗱𝗲𝘅 𝗥𝗮𝗻𝗴𝗲 » ({raw_text} to {len(links)})\n"
-                       f"📚𝗕𝗮𝘁𝗰𝗵 𝗡𝗮𝗺𝗲 » {b_name}\n\n"
-                       f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
-                       f"✨𝗧𝗫𝗧 𝗦𝗨𝗠𝗠𝗔𝗥𝗬✨ : {len(links)}\n"
-                       f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
-                       f"🔹𝗩𝗶𝗱𝗲𝗼 » {video_count}\n🔹𝗣𝗱𝗳 » {pdf_count}\n🔹𝗜𝗺𝗴 » {img_count}\n🔹𝗭𝗶𝗽 » {zip_count}\n🔹𝗙𝗮𝗶𝗹𝗲𝗱 𝗨𝗿𝗹 » {failed_count}\n\n"
-                       f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
-                       f"✅𝗦𝗧𝗔𝗧𝗨𝗦 » 𝗖𝗢𝗠𝗣𝗟𝗘𝗧𝗘𝗗`")
-    await m.reply_text(f"<pre><code>📥𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆 ➤『{CR}』</code></pre>")
+        # ------------------ ERROR HANDLING --------------------
+        except Exception as e:
+            await m.reply_text(
+                f"‼️𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱𝗶𝗻𝗴 𝗙𝗮𝗶𝗹𝗲𝗱‼️\n\n"
+                f"📝𝗡𝗮𝗺𝗲 » `{name}`\n\n"
+                f"🔗𝗨𝗥𝗟 » <a href=\"{url}\">__**Click Here to See Link**__</a>`"
+            )
+            count += 1
+            failed_count += 1
+
+    # --------------- SUMMARY ----------------
+    await m.reply_text(
+        f"`✨𝗕𝗔𝗧𝗖𝗛 𝗦𝗨𝗠𝗠𝗔𝗥𝗬✨\n\n"
+        f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
+        f"📛𝗜𝗡𝗗𝗘𝗫 𝗥𝗔𝗡𝗚𝗘 » ({raw_text} to {len(links)})\n"
+        f"📚𝗕𝗔𝗧𝗖𝗛 𝗡𝗔𝗠𝗘 » {b_name}\n\n"
+        f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
+        f"✨𝗧𝗫𝗧 𝗦𝗨𝗠𝗠𝗔𝗥𝗬✨ : {len(links)}\n"
+        f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
+        f"🔹𝗩𝗜𝗗𝗘𝗢 » {video_count}\n"
+        f"🔹𝗣𝗗𝗙 » {pdf_count}\n"
+        f"🔹𝗜𝗠𝗚 » {img_count}\n"
+        f"🔹𝗭𝗜𝗣 » {zip_count}\n"
+        f"🔹𝗙𝗔𝗜𝗟𝗘𝗗 𝗨𝗥𝗟 » {failed_count}\n\n"
+        f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n"
+        f"✅𝗦𝗧𝗔𝗧𝗨𝗦 » 𝗖𝗢𝗠𝗣𝗟𝗘𝗧𝗘𝗗`"
+    )
+
+    await m.reply_text(f"<pre><code>📥𝗘𝗫𝗧𝗥𝗔𝗖𝗧𝗘𝗗 𝗕𝗬 ➤『{CR}』</code></pre>")
     await m.reply_text(f"<pre><code>『😏𝗥𝗲𝗮𝗰𝘁𝗶𝗼𝗻 𝗞𝗼𝗻 𝗗𝗲𝗴𝗮😏』</code></pre>")                 
 
-bot.run()
 if __name__ == "__main__":
-    asyncio.run(main())
+    bot.run()

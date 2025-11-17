@@ -665,13 +665,17 @@ try:
                 )
                 url = response.json()['url']
 
+# ------------------ LIVELEARN + AKAMAI + OTHER HANDLERS ------------------
+
 try:
     # ------------------ LIVELEARN --------------------
     if "https://appx-transcoded-videos.livelearn.in/videos/rozgar-data/" in url:
+
         url = url.replace(
             "https://appx-transcoded-videos.livelearn.in/videos/rozgar-data/",
             ""
         )
+
         name1 = (
             links[i][0]
             .replace("\t", "")
@@ -684,61 +688,64 @@ try:
             .replace(".", "")
             .strip()
         )
+
         name = f'{str(count).zfill(3)}) {name1[:60]}'
         cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
 
     # ------------------ AKAMAI LIVELEARN --------------------
     elif "https://appx-transcoded-videos-mcdn.akamai.net.in/videos/bhainskipathshala-data/" in url:
+
         url = url.replace(
             "https://appx-transcoded-videos-mcdn.akamai.net.in/videos/bhainskipathshala-data/",
             ""
         )
+
         name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").strip()
         name = f'{str(count).zfill(3)}) {name1[:60]}'
         cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
 
-    # (BAAKI sab elif issi try ke andar aayenge...)
 
-elif "apps-s3-jw-prod.utkarshapp.com" in url:
+    # ------------------ UTKARSH --------------------
+    elif "apps-s3-jw-prod.utkarshapp.com" in url:
 
-    if 'enc_plain_mp4' in url:
-        url = url.replace(url.split("/")[-1], res + '.mp4')
+        if 'enc_plain_mp4' in url:
+            url = url.replace(url.split("/")[-1], res + '.mp4')
 
-    elif 'Key-Pair-Id' in url:
-        url = None
+        elif 'Key-Pair-Id' in url:
+            url = None
 
-    elif '.m3u8' in url:
-        q = (m3u8.loads(requests.get(url).text)).data['playlists'][1]['uri'].split("/")[0]
-        x = url.split("/")[5]
-        base = url.replace(x, "")
-        url = (m3u8.loads(requests.get(url).text)).data['playlists'][1]['uri'].replace(q + "/", base)
+        elif '.m3u8' in url:
+            q = (m3u8.loads(requests.get(url).text)).data['playlists'][1]['uri'].split("/")[0]
+            x = url.split("/")[5]
+            base = url.replace(x, "")
+            url = (m3u8.loads(requests.get(url).text)).data['playlists'][1]['uri'].replace(q + "/", base)
 
-elif "/master.mpd" in url or "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
-    id = url.split("/")[-2]
-    url = f"https://anonymouspwplayerr-f996115ea61a.herokuapp.com/pw?url={url}&token={raw_text4}"
-            #elif '/master.mpd' in url:
-             #id =  url.split("/")[-2]
-             #url = f"https://dl.alphacbse.site/download/{id}/master.m3u8"
-            
-        
-            name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-            name = f'{str(count).zfill(3)}) {name1[:60]}'
+    # ------------------ PW DRM --------------------
+    elif "/master.mpd" in url or "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
 
-            #if 'cpvod.testbook' in url:
-                #CPVOD = url.split("/")[-2]
-                #url = requests.get(f'https://extractbot.onrender.com/classplus?link=https://cpvod.testbook.com/{CPVOD}/playlist.m3u8', headers={'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9r'}).json()['url']
-            
-            #if 'cpvod.testbook' in url:
-               #url = requests.get(f'https://mon-key-3612a8154345.herokuapp.com/get_keys?url=https://cpvod.testbook.com/{CPVOD}/playlist.m3u8', headers={'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9r'}).json()['url']
-           
-           
-            if 'khansirvod4.pc.cdn.bitgravity.com' in url:               
-               parts = url.split('/')               
-               part1 = parts[1]
-               part2 = parts[2]
-               part3 = parts[3] 
-               part4 = parts[4]
-               part5 = parts[5]
+        id = url.split("/")[-2]
+        url = f"https://anonymouspwplayerr-f996115ea61a.herokuapp.com/pw?url={url}&token={raw_text4}"
+
+        name1 = (
+            links[i][0].replace("\t", "").replace(":", "").replace("/", "")
+            .replace("+", "").replace("#", "").replace("|", "").replace("@", "")
+            .replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+        )
+
+        name = f'{str(count).zfill(3)}) {name1[:60]}'
+
+
+    # ------------------ KHAN SIR --------------------
+    if 'khansirvod4.pc.cdn.bitgravity.com' in url:
+        parts = url.split('/')
+        part1 = parts[1]
+        part2 = parts[2]
+        part3 = parts[3]
+        part4 = parts[4]
+        part5 = parts[5]
+
+except Exception as e:
+    print(e)
                
                print(f"PART1: {part1}")
                print(f"PART2: {part2}")

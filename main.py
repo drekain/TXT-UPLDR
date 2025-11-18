@@ -1,5 +1,3 @@
-# Don't Remove Credit Tg - @Tushar0125
-# Ask Doubt on telegram @Tushar0125
 # NOTE: This file is the original file with minimal, non-destructive adjustments
 #       to prevent syntax errors while preserving all original lines.
 #       I have NOT removed any original content — instead I commented out

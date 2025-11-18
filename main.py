@@ -48,6 +48,23 @@ from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import io
 
+# ---------- KEEP ALIVE SERVER ----------
+from flask import Flask
+import threading
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is alive"
+
+def run():
+    app.run(host="0.0.0.0", port=8080)
+
+def keep_alive():
+    t = threading.Thread(target=run)
+    t.start()
+
 cookies_file_path = os.getenv("COOKIES_FILE_PATH", "youtube_cookies.txt")
 
 #pwimg = "https://graph.org/file/8add8d382169e326f67e0-3bf38f92e52955e977.jpg"
@@ -797,4 +814,5 @@ async def ytplaylist_to_txt(client: Client, message: Message):
 # If this file is executed directly, run the bot.
 if __name__ == "__main__":
     # Start the bot normally. Because we commented broken blocks above, the bot will run.
-    bot.run()
+    keep_alive()
+bot.run()

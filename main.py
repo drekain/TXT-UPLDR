@@ -569,158 +569,222 @@ async def upload(bot: Client, m: Message):
     await editable.edit(
         f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 𝗙𝗼𝘂𝗻𝗱 𝗔𝗿𝗲 {len(links)}\n\n🔹Img : {img_count}  🔹Pdf : {pdf_count}\n🔹Zip : {zip_count}  🔹Vid : {video_count}`"
     )
-    # If you want the full interactive flow restored, I left the original content below
-    # (commented) so you can re-enable pieces selectively without losing any lines.
 
-    """
-    ORIGINAL_BLOCK_COMMENTED_START
-    (Below is the original content from the repository that was causing syntax errors
-     due to truncated lines, invalid unicode sequences and unmatched quotes. I did NOT
-     delete these lines; they are preserved exactly here so nothing is lost. You can
-     uncomment and fix any specific pieces later as needed.)
+    failed_count = 0
+    processed_count = 0
 
-    await editable.edit(f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 𝗙𝗼𝘂𝗻𝗱 𝗔𝗿𝗲 {len(links)}\n\n🔹Img : {img_count}  🔹Pdf : {pdf_count}\n🔹Zip : {zip_count}  🔹Vid[...]
-    input0: Message = await bot.listen(editable.chat.id)
-    raw_text = input0.text
-    await input0.delete(True)
-    try:
-        arg = int(raw_text)
-    except:
-        arg = 1
-    await editable.edit("📚 𝗘𝗻𝘁𝗲𝗿 𝗬𝗼𝘂𝗿 𝗕𝗮𝘁𝗰𝗵 𝗡𝗮𝗺𝗲 📚\n\n🦠 𝗦𝗲𝗻𝗱 `1` 𝗙𝗼𝗿 𝗨𝘀𝗲 𝗗𝗲𝗳𝗮𝘂𝗹𝘁 🦠"[...]
-    input1: Message = await bot.listen(editable.chat.id)
-    raw_text0 = input1.text
-    await input1.delete(True)
-    if raw_text0 == '1':
-        b_name = file_name
-    else:
-        b_name = raw_text0
-    
-
-    await editable.edit("**📸 𝗘𝗻𝘁𝗲𝗿 𝗥𝗲𝘀𝗼𝗹𝘂𝘁𝗶𝗼𝗻 📸**\n➤ `144`\n➤ `240`\n➤ `360`\n➤ `480`\n➤ `720`\n➤ `1080`")
-    input2: Message = await bot.listen(editable.chat.id)
-    raw_text2 = input2.text
-    await input2.delete(True)
-    try:
-        if raw_text2 == "144":
-            res = "256x144"
-        elif raw_text2 == "240":
-            res = "426x240"
-        elif raw_text2 == "360":
-            res = "640x360"
-        elif raw_text2 == "480":
-            res = "854x480"
-        elif raw_text2 == "720":
-            res = "1280x720"
-        elif raw_text2 == "1080":
-            res = "1920x1080" 
-        else: 
-            res = "UN"
-    except Exception:
-            res = "UN"
-    
-    
-
-    await editable.edit("📛 𝗘𝗻𝘁𝗲𝗿 𝗬𝗼𝘂𝗿 𝗡𝗮𝗺𝗲 📛\n\n🐥 𝗦𝗲𝗻𝗱 `1` 𝗙𝗼𝗿 𝗨𝘀𝗲 𝗗𝗲𝗳𝗮𝘂𝗹𝘁 🐥")
-    input3: Message = await bot.listen(editable.chat.id)
-    raw_text3 = input3.text
-    await input3.delete(True)
-    # Default credit message with link
-    credit = "️[𝗧𝘂𝘀𝗵𝗮𝗿](https://t.me/Tushar0125)"
-    if raw_text3 == '1':
-        CR = '[𝗧𝘂𝘀𝗵𝗮𝗿](https://t.me/Tushar0125)'
-    elif raw_text3:
+    def run_cmd(cmd):
         try:
-            text, link = raw_text3.split(',')
-            CR = f'[{text.strip()}]({link.strip()})'
-        except ValueError:
-            CR = raw_text3  # In case the input is not in the expected format, use the raw text
-    else:
-        CR = credit
-    #highlighter  = f"️ ⁪⁬⁮⁮⁮"
-    #if raw_text3 == 'Robin':
-        #MR = highlighter 
-    #else:
-        #MR = raw_text3
-   
-    await editable.edit("**𝗘𝗻𝘁𝗲𝗿 𝗣𝘄 𝗧𝗼𝗸𝗲𝗻 𝗙𝗼𝗿 𝗣𝘄 𝗨𝗽𝗹𝗼𝗮𝗱𝗶𝗻𝗴 𝗼𝗿 𝗦𝗲𝗻𝗱 `3` 𝗙𝗼𝗿 𝗢𝘁𝗵𝗲𝗿[...]
-    input4: Message = await bot.listen(editable.chat.id)
-    raw_text4 = input4.text
-    await input4.delete(True)
-    if raw_text4 == 3:
-        MR = token
-    else:
-        MR = raw_text4
+            return getstatusoutput(cmd)
+        except Exception as e:
+            logging.exception("run_cmd failed: %s", e)
+            return (1, "")
 
-    
+    def make_safe_filename(base, ext):
+        safe = re.sub(r'[\\/*?:"<>|]', "", base).strip()
+        return f"{safe}{ext}"
 
-    await editable.edit("𝗡𝗼𝘄 𝗦𝗲𝗻𝗱 𝗧𝗵𝗲 𝗧𝗵𝘂𝗺𝗯 𝗨𝗿𝗹 𝗘𝗴 » https://graph.org/file/13a89d77002442255efad-989ac290c1b3f13b44.jpg\n\n𝗢𝗿 𝗜��[...]
-    input6 = message = await bot.listen(editable.chat.id)
-    raw_text6 = input6.text
-    await input6.delete(True)
-    await editable.delete()
+    for idx in range(len(links)):
+        try:
+            item = links[idx]
 
-    thumb = input6.text
+            if isinstance(item, (list, tuple)) and len(item) >= 2:
+                proto = item[0] or ""
+                rest = item[1] or ""
+                if "://" in proto:
+                    url = proto + rest
+                elif proto.lower().startswith("http"):
+                    url = proto + "://" + rest
+                else:
+                    url = "https://" + rest.lstrip("/")
+            else:
+                url = str(item).strip()
 
-    if thumb.lower() == "no":
-        thumb = None
-    else:
-        if thumb.startswith("http://") or thumb.startswith("https://"):
-            getstatusoutput(f"wget '{thumb}' -O 'thumb.jpg'")
-            thumb = "thumb.jpg"
-        else:
-            thumb = None
-        failed_count =0
-        if len(links) == 1:
-            count = 1
-        else:
-            count = int(raw_text)
+            if not re.match(r"^https?://", url, flags=re.I):
+                url = "https://" + url.lstrip("/")
+
+            url = url.replace("file/d/", "uc?export=download&id=")\
+                     .replace("www.youtube-nocookie.com/embed", "youtu.be")\
+                     .replace("?modestbranding=1", "")\
+                     .replace("/view?usp=sharing", "")
+
+            try:
+                raw_title = links[idx][0]
+                base_name = re.sub(r'\s+', ' ', str(raw_title)).strip()
+                base_safe = re.sub(r'[\\/*?:"<>|]', "", base_name)[:60].strip()
+            except Exception:
+                base_safe = f"file_{idx+1}"
+
+            name = f"{str(idx+1).zfill(3)}) {base_safe}"
+            low = url.lower()
+
+            if any(low.endswith(ext) or (ext in low and low.split(ext)[-1].split('?')[0] == "") for ext in [".jpg", ".jpeg", ".png", ".webp"]):
+                if low.endswith(".png"):
+                    ext = ".png"
+                elif low.endswith(".webp"):
+                    ext = ".webp"
+                else:
+                    ext = ".jpg"
+
+                tmpf = make_safe_filename(name, ext)
+                try:
+                    r = requests.get(url, timeout=30, stream=True)
+                    if r.status_code == 200:
+                        with open(tmpf, "wb") as wf:
+                            for chunk in r.iter_content(65536):
+                                if chunk:
+                                    wf.write(chunk)
+                        try:
+                            await bot.send_photo(chat_id=m.chat.id, photo=tmpf, caption=f"Uploaded ➤ {name}")
+                            processed_count += 1
+                        except FloodWait as fw:
+                            wt = int(getattr(fw, "x", fw.value) if hasattr(fw, "x") else fw.value)
+                            await asyncio.sleep(wt)
+                            await bot.send_photo(chat_id=m.chat.id, photo=tmpf, caption=f"Uploaded ➤ {name}")
+                            processed_count += 1
+                        except Exception:
+                            failed_count += 1
+                    else:
+                        failed_count += 1
+                except Exception:
+                    failed_count += 1
+                finally:
+                    if os.path.exists(tmpf):
+                        try: os.remove(tmpf)
+                        except: pass
+                continue
+
+            if ".zip" in low:
+                tmpf = make_safe_filename(name, ".zip")
+                cmd = f'yt-dlp -o "{tmpf}" "{url}"'
+                try:
+                    rc, out = run_cmd(cmd)
+                    if rc == 0 or os.path.exists(tmpf):
+                        try:
+                            await bot.send_document(chat_id=m.chat.id, document=tmpf, caption=f"Uploaded ➤ {name}")
+                            processed_count += 1
+                        except Exception:
+                            failed_count += 1
+                        finally:
+                            try: os.remove(tmpf)
+                            except: pass
+                    else:
+                        failed_count += 1
+                except:
+                    failed_count += 1
+                continue
+
+            if ".pdf" in low:
+                tmpf = make_safe_filename(name, ".pdf")
+                cmd = f'yt-dlp -o "{tmpf}" "{url}"'
+                try:
+                    rc, out = run_cmd(cmd)
+                    if rc == 0 or os.path.exists(tmpf):
+                        try:
+                            await bot.send_document(chat_id=m.chat.id, document=tmpf, caption=f"Uploaded ➤ {name}")
+                            processed_count += 1
+                        except Exception:
+                            failed_count += 1
+                        finally:
+                            try: os.remove(tmpf)
+                            except: pass
+                    else:
+                        failed_count += 1
+                except:
+                    failed_count += 1
+                continue
+
+            if "visionias" in url:
+                try:
+                    async with ClientSession() as session:
+                        async with session.get(url, timeout=30) as resp:
+                            text = await resp.text()
+                            m = re.search(r'(https://.*?playlist\.m3u8.*?)"', text)
+                            if m:
+                                url = m.group(1)
+                except:
+                    pass
+
+            if any(x in url for x in [
+                "media-cdn.classplusapp.com",
+                "videos.classplusapp",
+                "tencdn.classplusapp",
+                "media-cdn-alisg.classplusapp.com"
+            ]):
+                try:
+                    headers = {
+                        'Host': 'api.classplusapp.com',
+                        'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9',
+                        'user-agent': 'Mobile-Android'
+                    }
+                    resp = requests.get("https://api.classplusapp.com/cams/uploader/video/jw-signed-url",
+                                        headers=headers, params={'url': url}, timeout=30)
+                    if resp.status_code == 200:
+                        url = resp.json().get("url", url)
+                except:
+                    pass
+
+            if "apps-s3-jw-prod.utkarshapp.com" in url:
+                try:
+                    if 'enc_plain_mp4' in url:
+                        sel_res = (res if 'res' in locals() else '720')
+                        url = url.replace(url.split("/")[-1], f"{sel_res}.mp4")
+                    elif '.m3u8' in url:
+                        try:
+                            playlist_data = m3u8.loads(requests.get(url, timeout=30).text).data.get("playlists", [])
+                            if playlist_data and len(playlist_data) > 1:
+                                q = playlist_data[1]["uri"].split("/")[0]
+                                x = url.split("/")[5]
+                                base = url.replace(x, "")
+                                url = playlist_data[1]["uri"].replace(q + "/", base)
+                        except:
+                            pass
+                except:
+                    pass
+
+            if "/master.mpd" in url or "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+                try:
+                    token_val = (raw_text4 if "raw_text4" in locals() else "")
+                    url = f"https://anonymouspwplayerr-f996115ea61a.herokuapp.com/pw?url={url}&token={token_val}"
+                except:
+                    pass
+
+            tmpf = make_safe_filename(name, ".mp4")
+            cmd = f'yt-dlp -o "{tmpf}" "{url}" -R 10 --fragment-retries 10'
+
+            try:
+                rc, out = run_cmd(cmd)
+                if rc == 0 or os.path.exists(tmpf):
+                    try:
+                        if "helper" in globals() and hasattr(helper, "send_vid"):
+                            await helper.send_vid(bot, m, None, tmpf, None, name, None)
+                        else:
+                            await bot.send_document(chat_id=m.chat.id, document=tmpf, caption=f"Uploaded ➤ {name}")
+                        processed_count += 1
+                    except Exception:
+                        failed_count += 1
+                    finally:
+                        try: os.remove(tmpf)
+                        except: pass
+                else:
+                    failed_count += 1
+            except:
+                failed_count += 1
+                try: os.remove(tmpf)
+                except: pass
+                continue
+
+        except Exception:
+            failed_count += 1
+            continue
 
     try:
-            for i in range(count - 1, len(links)):
-                V = links[i][1].replace("file/d/", "uc?export=download&id=")\
-                               .replace("www.youtube-nocookie.com/embed", "youtu.be")\
-                               .replace("?modestbranding=1", "")\
-                               .replace("/view?usp=sharing", "")
+        await editable.edit(
+            f"`Processing completed.`\n\nTotal links: {len(links)}\nProcessed: {processed_count}\nFailed: {failed_count}"
+        )
+    except:
+        pass
 
-                url = "https://" + V
-
-                # -------------------------
-                # 1) VISIONIAS SECTION
-                # -------------------------
-                if "visionias" in url:
-                    async with ClientSession() as session:
-                        async with session.get(
-                            url,
-                            headers={
-                                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                                'Accept-Language': 'en-US,en;q=0.9',
-                                'Cache-Control': 'no-cache',
-                                'Connection': 'keep-alive',
-                                'Pragma': 'no-cache',
-                                'Referer': 'http://www.visionias.in/',
-                                'Sec-Fetch-Dest': 'iframe',
-                                'Sec-Fetch-Mode': 'navigate',
-                                'Sec-Fetch-Site': 'cross-site',
-                                'Upgrade-Insecure-Requests': '1',
-                                'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
-                                'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"',
-                                'sec-ch-ua-mobile': '?1',
-                                'sec-ch-ua-platform': '"Android"',
-                            }
-                        ) as resp:
-                            text = await resp.text()
-                            match = re.search(r'(https://.*?playlist\.m3u8.*?)"', text)
-                            if match:
-                                url = match.group(1)
-                            else:
-                                url = None
-
-                # ... (the rest of the original content continues and is preserved exactly here)
-    ORIGINAL_BLOCK_COMMENTED_END
-    """
-
-    # End of upload handler - safe fallback return (original flow is preserved above)
     return
 
 from pytube import Playlist
